@@ -31,7 +31,7 @@ var product = {
     item_id: 0,
     product_name: "",
     department_name: "",
-    price: 0,
+    price: 0,         
     stock_quantity: 0,
 }
 
