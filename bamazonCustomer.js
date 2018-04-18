@@ -25,6 +25,7 @@ function queryAllProducts() {
                 t.cell('product_name', product.product_name)
                 t.cell('department_name', product.department_name)
                 t.cell('Price', product.price )
+               // t.cell('product_sales', product.product_sales )
                 t.cell('stock_quantity', product.stock_quantity )
                 t.newRow()
             })
@@ -46,6 +47,7 @@ var product = {
     department_name: "",
     price: 0,         
     stock_quantity: 0,
+    product_sales:0,
 }
 
 function input() {
@@ -105,6 +107,7 @@ function checkQuantity() {
                 product.product_name = res[0].product_name;
                 product.department_name = res[0].department_name;
                 product.price = res[0].price;
+                product.product_sales=res[0].product_sales;
                 updateProduct(remainingQunatitiy)
             } else {
                 console.log("Insufficient quantity!");
@@ -116,12 +119,13 @@ function checkQuantity() {
         });
 }
 function updateProduct(quantity) {
-    //console.log("Updating all Rocky Road quantities...\n");
+    var totalPrice=(product.price * product.stock_quantity)+product.product_sales
     var query = connection.query(
         "UPDATE products SET ? WHERE ?",
         [
             {
-                stock_quantity: quantity
+                stock_quantity: quantity,
+                product_sales:totalPrice,
             },
             {
                 item_id: product.item_id

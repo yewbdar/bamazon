@@ -34,22 +34,23 @@ function start() {
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "exit"]
         })
         .then(function (answer) {
-
-            if (answer.choice === "View Products for Sale") {
+            switch(answer.choice){
+                case "View Products for Sale":
                 queryAllProducts();
-            }
-            else if (answer.choice === "View Low Inventory") {
+                break;
+                case "View Low Inventory":
                 queryLowInventory();
-            }
-            else if (answer.choice === "Add to Inventory") {
+                break;
+                case "Add to Inventory":
                 addToInventory();
-            }
-            else if (answer.choice === "Add New Product") {
+                break;
+                case "Add New Product":
                 addNewProduct();
-            }
-            else if (answer.choice === "exit") {
-                console.log("Good Bye !")
+                break;
+                case "exit":
+                console.log("Good Bye !");
                 process.exit();
+                break;
             }
         });
 }
@@ -97,7 +98,7 @@ function queryAddToInventory(productName,quantity) {
             ],
             function (err, res) {
                 if (err) throw err
-                console.log("successfully added " + product.stock_quantity + " quantity on " + productName + "!\n");
+                console.log("Successfully added " + product.stock_quantity + " quantity on " + productName + "!\n");
 
                 start();
             }
@@ -144,7 +145,7 @@ function addNewProduct() {
     inquirer.prompt([{
         type: "input",
         name: "prodautName",
-        message: "What is prodaut name ?",
+        message: "What is the prodaut name ?",
         validate: function validateInput(value) {
             if (isNaN(value) === true && value != "") {
                 return true;
@@ -154,7 +155,7 @@ function addNewProduct() {
     }, {
         type: "input",
         name: "departmentName",
-        message: "what is department name :",
+        message: "what is the department name :",
         validate: function validateInput(value) {
             if (isNaN(value) === true && value != "") {
                 return true;
@@ -177,7 +178,7 @@ function addNewProduct() {
     {
         type: "input",
         name: "quantity",
-        message: "quantity",
+        message: "Add quantity",
         validate: function validateInput(value) {
             if (isNaN(value) === false && value != "") {
                 return true;
@@ -206,7 +207,6 @@ function queryAddNewData() {
         start();
     })
 }
-
 function queryLowInventory() {
     const cTable = require('console.table');
     connection.query("SELECT * FROM Products WHERE stock_quantity < 5",
