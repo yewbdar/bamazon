@@ -91,7 +91,7 @@ function queryAddNewDepartment(){
     }],function(err,res){
          if(err)throw err;
          console.log("Succssefully added !");
-
+         start();
     });
       
 }
