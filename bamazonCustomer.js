@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('easy-table');
 var connection = mysql.createConnection({
 
     host: "localhost",
@@ -16,17 +17,29 @@ connection.connect(function (err) {
 
 function queryAllProducts() {
     connection.query("SELECT * FROM Products", function (err, res) {
-        for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + "|" + res[i].stock_quantity);
+        if(err)throw err;
+        if(res.length>0){
+        var t = new Table
+            res.forEach(function (product) {
+                t.cell('Product Id', product.item_id)
+                t.cell('product_name', product.product_name)
+                t.cell('department_name', product.department_name)
+                t.cell('Price', product.price )
+                t.cell('stock_quantity', product.stock_quantity )
+                t.newRow()
+            })
+            console.log(t.toString())
         }
-        console.log("-----------------------------------");
-
+        else{
+          console.log("Data not found!")
+        }
+        input();
     });
-    connection.end();
+    // connection.end();
     
 }
-//queryAllProducts();
-input();
+queryAllProducts();
+
 var product = {
     item_id: 0,
     product_name: "",
@@ -51,7 +64,7 @@ function input() {
     {
         type: "input",
         name: "quantity",
-        message: "How many would you like ? ",
+        message: "How many would you like to buy ? ",
         validate: function validateInput(value) {
             if (isNaN(value) === false && value !="") {
                 return true;
@@ -84,6 +97,7 @@ function checkQuantity() {
     }],
         function (err, res) {
             if (err) throw err;
+            if(res.length>0){
             if (res[0].stock_quantity >= product.stock_quantity) {
                 product.price = res[0].price;
                 var remainingQunatitiy = res[0].stock_quantity - product.stock_quantity;
@@ -96,6 +110,9 @@ function checkQuantity() {
                 console.log("Insufficient quantity!");
                 purchaseAgain();
             }
+        }else{
+            console.log("Data not found!");
+        }
         });
 }
 function updateProduct(quantity) {

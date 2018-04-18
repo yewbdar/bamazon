@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/yewbdar/bamazon#readme",
   "dependencies": {
+    "console.table": "^0.10.0",
+    "easy-table": "^1.1.1",
     "inquirer": "^5.2.0",
     "mysql": "^2.15.0"
   }

@@ -1,5 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('easy-table');
+
 var connection = mysql.createConnection({
 
     host: "localhost",
@@ -32,20 +34,21 @@ function start() {
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "exit"]
         })
         .then(function (answer) {
-            // based on their answer, either call the bid or the post functions
+
             if (answer.choice === "View Products for Sale") {
                 queryAllProducts();
             }
             else if (answer.choice === "View Low Inventory") {
-                lowInventory();
+                queryLowInventory();
             }
             else if (answer.choice === "Add to Inventory") {
                 addToInventory();
             }
             else if (answer.choice === "Add New Product") {
-
+                addNewProduct();
             }
             else if (answer.choice === "exit") {
+                console.log("Good Bye !")
                 process.exit();
             }
         });
@@ -56,7 +59,7 @@ function addToInventory() {
         name: "id",
         message: "What is the ID of the item you like to add more?",
         validate: function validateInput(value) {
-            if (isNaN(value) === false && value != "" ) {
+            if (isNaN(value) === false && value != "") {
                 return true;
             }
             return false;
@@ -78,18 +81,15 @@ function addToInventory() {
         product.item_id = answer.id;
         product.stock_quantity = answer.quantity;
         checkIfDataExist();
-
     })
 }
-function queryAddToInventory() {
-    //check if the data is avalable before update data.
-     if (isDataExist) {
-        console.log("am here")
+function queryAddToInventory(productName,quantity) {
+    if (isDataExist) {
         connection.query(
             "UPDATE products SET ? WHERE ?",
             [
                 {
-                    stock_quantity: product.stock_quantity,
+                    stock_quantity: quantity,
                 },
                 {
                     item_id: product.item_id,
@@ -97,23 +97,24 @@ function queryAddToInventory() {
             ],
             function (err, res) {
                 if (err) throw err
-                console.log("successfully added " + product.stock_quantity + " quantity on " + product.product_name + "!\n");
+                console.log("successfully added " + product.stock_quantity + " quantity on " + productName + "!\n");
 
                 start();
             }
         );
-        isDataExist=false;
+        isDataExist = false;
     }
- }
-function checkIfDataExist(){
-    connection.query("SELECT * FROM Products WHERE ?",[{ item_id: product.item_id }], function (err, res) {
+}
+function checkIfDataExist() {//check if the data is avalable before update data.
+    connection.query("SELECT * FROM Products WHERE ?", [{ item_id: product.item_id }], function (err, res) {
         if (err) throw err;
         if (res.length > 0) {
             isDataExist = true;
-            product.product_name=res.product_name;
-            queryAddToInventory();
+            var quan=res[0].stock_quantity + 
+            product.stock_quantity
+            queryAddToInventory(res[0].product_name,quan);
         }
-        else{
+        else {
             console.log("data not found!");
             start();
         }
@@ -122,34 +123,35 @@ function checkIfDataExist(){
 function queryAllProducts() {
     connection.query("SELECT * FROM Products", function (err, res) {
         if (res.length > 0) {
-            for (var i = 0; i < res.length; i++) {
-                console.log("\n" + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + "|" + res[i].stock_quantity);
-            }
-            console.log("-----------------------------------");
+            var t = new Table
+            res.forEach(function (product) {
+                t.cell('Product Id', product.item_id)
+                t.cell('product_name', product.product_name)
+                t.cell('department_name', product.department_name)
+                t.cell('Price', product.price )
+                t.cell('stock_quantity', product.stock_quantity )
+                t.newRow()
+            })
+            console.log(t.toString())
+            
         } else {
             console.log("Data not found !")
         }
-         return true;
-        
+        start();
     });
-
-    console.log("hi");
-    start();
-
-
 }
 function addNewProduct() {
     inquirer.prompt([{
         type: "input",
         name: "prodautName",
-        message: "What is prodautName ?",
+        message: "What is prodaut name ?",
         validate: function validateInput(value) {
-            if (isNaN(value) === true && value != "" ) {
+            if (isNaN(value) === true && value != "") {
                 return true;
             }
             return false;
         }
-    },{
+    }, {
         type: "input",
         name: "departmentName",
         message: "what is department name :",
@@ -184,54 +186,51 @@ function addNewProduct() {
         },
     }
     ]).then(function (answer) {
-        //product.item_id = answer.id;
-        product.product_name = answer.prodautName;
-        product.department_name=answer.departmentName;
-        product.price=answer.price;
-        product.stock_quantity=answer.quantity;
-        //checkIfDataExist();
 
+        product.product_name = answer.prodautName;
+        product.department_name = answer.departmentName;
+        product.price = answer.price;
+        product.stock_quantity = answer.quantity;
+        queryAddNewData();
     })
 }
-function queryAddNewData(){
-    connection.query("INSERT INTO Products SET ? ",[{
-        product_name:product.product_name,
-        department_name:product.department_name,
-        price:product.price,
-        stock_quantity:product.stock_quantity
-    }],function(err){
-        if(err) throw err
-        console.log("new produact added !");
+function queryAddNewData() {
+    connection.query("INSERT INTO Products SET ? ", [{
+        product_name: product.product_name,
+        department_name: product.department_name,
+        price: product.price,
+        stock_quantity: product.stock_quantity
+    }], function (err) {
+        if (err) throw err
+        console.log("Successfully new produact added !");
+        start();
     })
 }
+
 function queryLowInventory() {
+    const cTable = require('console.table');
     connection.query("SELECT * FROM Products WHERE stock_quantity < 5",
         function (err, res) {
+            if (err) throw err;
             console.log(res.length)
             if (res.length > 0) {
-                for (var i = 0; i < res.length; i++) {
-                    console.log("\n" + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + "|" + res[i].stock_quantity);
-                }
-                console.log("-----------------------------------");
+                var t = new Table
+                res.forEach(function (product) {
+                    t.cell('Product Id', product.item_id)
+                    t.cell('product_name', product.product_name)
+                    t.cell('department_name', product.department_name)
+                    t.cell('Price', product.price )
+                    t.cell('stock_quantity', product.stock_quantity )
+                    t.newRow()
+                })
+                console.log(t.toString())
+                
             } else {
                 console.log("Data not found !")
             }
-
+            start();
         });
-    start();
+    
 }
-function chooseAgain() {
 
-    inquirer.prompt({
-        name: "again",
-        type: "confirm",
-        message: "Would you like to continue ?"
-    }).then(function (answer) {
-        if (answer.again === true) {
-            input();
-        } else {
 
-            process.exit();
-        }
-    });
-}
