@@ -40,7 +40,7 @@ function start() {
         .then(function (answer) {
             switch (answer.choice) {
                 case "View Product Sales by Department":
-                    queryAllProducts();
+                queryGetAllData();
                     break;
                 case "Create New Department":
                 addNewDepartment();
@@ -84,7 +84,6 @@ function addNewDepartment() {
     })
 }
 function queryAddNewDepartment(){
-
     connection.query("INSERT INTO departments SET ?",[{
         department_name:department.departmentName,
         over_head_costs:department.overHeadCosts
@@ -94,4 +93,28 @@ function queryAddNewDepartment(){
          start();
     });
       
+}
+function queryGetAllData(){
+    connection.query(
+        "SELECT departments.department_id,departments.department_name,departments.over_head_costs,products.product_sales FROM departments " + 
+        " INNER JOIN products  ON products.department_name=departments.department_name GROUP BY products.department_name ",
+       
+        [{}],function(err,res){
+            if(err)throw err;
+            var t = new Table
+            res.forEach(function (department) {
+                t.cell('department_id', department.department_id);
+                t.cell('department_name', department.department_name);
+                t.cell('over_head_costs', department.over_head_costs);
+                t.cell('product_sales', department.product_sales );
+               // t.cell('product_sales', product.product_sales )
+               var total_profit=department.over_head_costs-department.product_sales ;
+                t.cell('total_profit',total_profit )
+                t.newRow()
+            })
+            console.log(t.toString())
+            //console.log(res);
+            start();
+        })
+
 }
