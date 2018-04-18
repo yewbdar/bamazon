@@ -51,7 +51,7 @@ function input() {
     {
         type: "input",
         name: "quantity",
-        message: "How many would you like ? (quit with 0)",
+        message: "How many would you like ? ",
         validate: function validateInput(value) {
             if (isNaN(value) === false && value !="") {
                 return true;
