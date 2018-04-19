@@ -1,28 +1,9 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('easy-table');
-
-var connection = mysql.createConnection({
-
-    host: "localhost",
-    port: 8889,
-    user: "root",
-    password: "root",
-    database: 'bamazon'
-});
-
-connection.connect(function (err) {
-    if (err) throw (err);
-    // console.log(`connected as id ${connection.threadId}`);
-});
-
-var product = {
-    item_id: 0,
-    product_name: "",
-    department_name: "",
-    price: 0,
-    stock_quantity: 0,
-}
+var colors = require('colors');
+var connection = require("./dbConnection.js");
+var product = require("./objects.js");
 var isDataExist = false;
 start();
 function start() {
@@ -48,7 +29,7 @@ function start() {
                 addNewProduct();
                 break;
                 case "exit":
-                console.log("Good Bye !");
+                console.log("Good Bye !".green);
                 process.exit();
                 break;
             }
@@ -66,7 +47,6 @@ function addToInventory() {
             return false;
         }
     },
-
     {
         type: "input",
         name: "quantity",
@@ -98,7 +78,7 @@ function queryAddToInventory(productName,quantity) {
             ],
             function (err, res) {
                 if (err) throw err
-                console.log("Successfully added " + product.stock_quantity + " quantity on " + productName + "!\n");
+                console.log("Successfully added ".green + product.stock_quantity.green + " quantity on ".green + productName .green+ "!\n".green);
 
                 start();
             }
@@ -116,7 +96,7 @@ function checkIfDataExist() {//check if the data is avalable before update data.
             queryAddToInventory(res[0].product_name,quan);
         }
         else {
-            console.log("data not found!");
+            console.log("data not found!".red);
             start();
         }
     })
@@ -133,10 +113,10 @@ function queryAllProducts() {
                 t.cell('stock_quantity', product.stock_quantity )
                 t.newRow()
             })
-            console.log(t.toString())
+            console.log(t.toString().gray)
             
         } else {
-            console.log("Data not found !")
+            console.log("Data not found !".red)
         }
         start();
     });
@@ -203,7 +183,7 @@ function queryAddNewData() {
         stock_quantity: product.stock_quantity
     }], function (err) {
         if (err) throw err
-        console.log("Successfully new produact added !");
+        console.log("Successfully added !".green);
         start();
     })
 }
@@ -212,7 +192,6 @@ function queryLowInventory() {
     connection.query("SELECT * FROM Products WHERE stock_quantity < 5",
         function (err, res) {
             if (err) throw err;
-            console.log(res.length)
             if (res.length > 0) {
                 var t = new Table
                 res.forEach(function (product) {
@@ -223,10 +202,10 @@ function queryLowInventory() {
                     t.cell('stock_quantity', product.stock_quantity )
                     t.newRow()
                 })
-                console.log(t.toString())
+                console.log(t.toString().gray)
                 
             } else {
-                console.log("Data not found !")
+                console.log("Data not found !".red)
             }
             start();
         });

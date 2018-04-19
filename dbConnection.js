@@ -7,13 +7,8 @@ var connection = mysql.createConnection({
     password: "root",
     database: 'bamazon'
 });
-module.exports={
-    connection:connection,
-}
-
-connection.connect(function(err){
-    if(err) throw(err);
-    console.log(`connected as id ${connection.threadId}`);
-
-    
+connection.connect(function (err) {
+    if (err) throw (err);
+    // console.log(`connected as id ${connection.threadId}`);
 });
+module.exports = connection;

@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/yewbdar/bamazon#readme",
   "dependencies": {
+    "colors": "^1.2.1",
     "console.table": "^0.10.0",
     "easy-table": "^1.1.1",
     "inquirer": "^5.2.0",
