@@ -9,16 +9,16 @@
 
  #### supervisor
 
-#Technology used
+# Technology used
  * javascript
  * mysql
  * Node js (npm mysql,npm inquirer,npm console.table,npm color)
- #Built with
+# Built with
  * visual code 
  * trerminal
- #Author
+# Author
  * Yewbdar Girma
- #Acknowledgment
+# Acknowledgment
  * UT,bootcamp instractours
  
 
