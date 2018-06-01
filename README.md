@@ -13,7 +13,7 @@
 # Technology used
  * javascript
  * mysql
- * Node js (npm mysql,npm inquirer,npm console.table,npm color)
+ * Node js (npm mysql, inquirer,console.table, color)
 # Built with
  * visual code 
  * trerminal
